@@ -239,5 +239,6 @@ public class PathTest {
     public void testCreateShortestPathFromNodesException() {
         Path.createShortestPathFromNodes(graph, Arrays.asList(new Node[] { nodes[1], nodes[0] }));
     }
+    // Trap
 
 }
