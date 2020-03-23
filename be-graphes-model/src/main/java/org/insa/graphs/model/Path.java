@@ -3,7 +3,7 @@ package org.insa.graphs.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
+import java.lang.*;
 /**
  * <p>
  * Class representing a path between nodes in a graph.
@@ -210,11 +210,15 @@ public class Path {
      * 
      * @return Total length of the path (in meters).
      * 
-     * @deprecated Need to be implemented.
+     * 
      */
     public float getLength() {
-        // TODO:
-        return 0;
+    	float longueur = 0;
+        for (Arc line : arcs)
+        {
+        	longueur += line.getLength();
+        }
+        return longueur;
     }
 
     /**
@@ -225,11 +229,15 @@ public class Path {
      * @return Time (in seconds) required to travel this path at the given speed (in
      *         kilometers-per-hour).
      * 
-     * @deprecated Need to be implemented.
+     * 
      */
     public double getTravelTime(double speed) {
-        // TODO:
-        return 0;
+        float temps = 0;
+        for ( Arc line : arcs)
+        {
+        	temps += line.getLength()*3600/(speed*Math.pow(10,3));
+        }
+        return temps;
     }
 
     /**
@@ -238,11 +246,15 @@ public class Path {
      * 
      * @return Minimum travel time to travel this path (in seconds).
      * 
-     * @deprecated Need to be implemented.
+     * 
      */
     public double getMinimumTravelTime() {
-        // TODO:
-        return 0;
+    	float temps = 0;
+        for ( Arc line : arcs)
+        {
+        	temps += line.getMinimumTravelTime();
+        }
+        return temps;
     }
 
 }
