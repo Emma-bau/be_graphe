@@ -236,10 +236,11 @@ public class PathTest {
         Path.createFastestPathFromNodes(graph, Arrays.asList(new Node[] { nodes[1], nodes[0] }));
     }
 
-    /*@Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testCreateShortestPathFromNodesException() {
         Path.createShortestPathFromNodes(graph, Arrays.asList(new Node[] { nodes[1], nodes[0] }));
-    }*/
+    }
+    
     // Trap
 
 }

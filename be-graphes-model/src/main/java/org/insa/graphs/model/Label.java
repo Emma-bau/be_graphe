@@ -18,7 +18,7 @@ public class Label implements Comparable<Label> {
 	{
 		this.node = null;
 		this.hasBeenVisited = false;
-		this.cost = Float.MAX_VALUE;
+		this.cost = Double.MAX_VALUE;
 		this.previousArc = null;
 		this.previousLabel = null;
 	}
@@ -26,7 +26,7 @@ public class Label implements Comparable<Label> {
 	public Label(Node node) {
 		this.node = node;
 		this.hasBeenVisited = false;
-		this.cost = Float.MAX_VALUE;
+		this.cost = Double.MAX_VALUE;
 		this.previousArc = null;
 		this.previousLabel = null;
 	}

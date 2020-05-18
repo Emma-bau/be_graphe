@@ -3,7 +3,7 @@ package org.insa.graphs.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.lang.*;
+
 
 /**
  * <p>
@@ -35,7 +35,7 @@ public class Path {
 	 * 
 	 */
 	public static Path createFastestPathFromNodes(Graph graph, List<Node> nodes) throws IllegalArgumentException {
-		List<Arc> arcs = new ArrayList<Arc>();
+		try{List<Arc> arcs = new ArrayList<Arc>();
 		if (nodes.size() == 0)
 		{
 			return new Path(graph);
@@ -50,7 +50,13 @@ public class Path {
 				arcs.add(succ_temps(nodes.get(i), nodes.get(i+1)));
 			}
 			return new Path(graph, arcs);
+		}}
+		catch(IllegalArgumentException e)
+		{
+			System.out.println("Erreur dans FastestPath");
+			return new Path(graph);
 		}
+		
 	}
 
 	private static Arc succ_temps(Node noeud_depart, Node noeud_arrive) throws IllegalArgumentException {
