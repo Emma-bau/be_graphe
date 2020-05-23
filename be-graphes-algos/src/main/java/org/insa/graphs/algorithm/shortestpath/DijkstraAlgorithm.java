@@ -21,7 +21,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 	protected ShortestPathSolution doRun() {
 
 		final ShortestPathData data = getInputData();
-		ShortestPathSolution solution = null;
+		ShortestPathSolution chemin_final = null;
 
 		// Création de notre tas, et de nos labels associés à la carte
 		BinaryHeap<Label> tas = new BinaryHeap<Label>();
@@ -55,10 +55,10 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 					}
 
 					Label successorLabel = labels.get(successorArc.getDestination().getId());
-					boolean inHeap = successorLabel.getCost() != Double.MAX_VALUE;
+					boolean inTas = successorLabel.getCost() != Double.MAX_VALUE;
+					
 
 					// On ne regarde le successeur que si il n'a pas déjà été marqué
-
 					if (!successorLabel.hasBeenVisited()) {
 						notifyNodeReached(successorArc.getDestination());
 						// Mise à jour du cout du sucesseur
@@ -68,19 +68,24 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 							successorLabel.setPreviousArc(successorArc);
 							successorLabel.setPreviousLabel(stepOrigin);
 
-							// On met à jour le tas
-							if (inHeap) {
+							// On met à jour le tas, si son cout est différent de Double.MAX_VALUE c'est qu'il a déjà été mis à jour.
+							//On va donc l'enlever du tas pour l'y remettre
+							if (inTas) {
 								tas.remove(successorLabel);
 							}
 							tas.insert(successorLabel);
+							
 						}
 					}
+					/*Mise à jour du tas*/
+					tas = UpdateTas(tas);
+					
 				}
 			}
 
 			// Si la destination n'est pas atteinte, le chemin n'est pas faisable
 			if (!destinationLabel.hasPreviousArc()) {
-				solution = new ShortestPathSolution(data, AbstractSolution.Status.INFEASIBLE);
+				chemin_final = new ShortestPathSolution(data, AbstractSolution.Status.INFEASIBLE);
 			} else {
 
 				ArrayList<Arc> arcs = new ArrayList<Arc>();
@@ -100,14 +105,14 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 				// On inverse le path
 				Collections.reverse(arcs);
 				Path path = new Path(data.getGraph(), arcs);
-				solution = new ShortestPathSolution(data, AbstractSolution.Status.OPTIMAL, path);
+				chemin_final = new ShortestPathSolution(data, AbstractSolution.Status.OPTIMAL, path);
 			}
 
-			return solution;
+			return chemin_final;
 		} 
 		else 
 		{
-			return solution = new ShortestPathSolution(data,AbstractSolution.Status.INFEASIBLE,null );
+			return chemin_final = new ShortestPathSolution(data,AbstractSolution.Status.INFEASIBLE,null );
 		}
 	}
 
@@ -115,5 +120,43 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 		return new Label(node);
 
 	}
+	
+	private BinaryHeap<Label> UpdateTas (BinaryHeap<Label> tas )
+	{
+		BinaryHeap<Label> newTas = new BinaryHeap<Label>();
+		ArrayList<Label> label = new ArrayList<Label>();
+		int taille = tas.size();  
+        Label tmp = new Label();  
+		/*On récupère tous les labels présents dans le tas*/
+		for(int j=0;j<taille;j++)
+		{
+			label.add(tas.deleteMin());
+			System.out.println(label.get(j).getCost());
+		}
+		/*On réalise un tri à bulle*/	
+        for(int i=0; i < taille; i++) 
+        {
+                for(int k=1; k< (taille-i); k++)
+                {  
+                        if(label.get(k-1).compareTo(label.get(k)) < 0)
+                        {
+                                /*Echange des elements*/
+                                tmp = label.get(k-1);  
+                                label.set(k-1,label.get(k));  
+                                label.set(k,tmp); 
+                        }
+ 
+                }
+        }
+        /*préparation du nouveau tas*/
+        for(int n=0; n<taille; n++)
+        {
+        	System.out.println(label.get(n).getCost());
+        	newTas.insert(label.get(n));
+        }
+		
+		return newTas;
+	}
+	
 
 }
