@@ -35,7 +35,7 @@ public class Path {
 	 * 
 	 */
 	public static Path createFastestPathFromNodes(Graph graph, List<Node> nodes) throws IllegalArgumentException {
-		try{List<Arc> arcs = new ArrayList<Arc>();
+		List<Arc> arcs = new ArrayList<Arc>();
 		if (nodes.size() == 0)
 		{
 			return new Path(graph);
@@ -50,13 +50,7 @@ public class Path {
 				arcs.add(succ_temps(nodes.get(i), nodes.get(i+1)));
 			}
 			return new Path(graph, arcs);
-		}}
-		catch(IllegalArgumentException e)
-		{
-			System.out.println("Erreur dans FastestPath");
-			return new Path(graph);
-		}
-		
+		}		
 	}
 
 	private static Arc succ_temps(Node noeud_depart, Node noeud_arrive) throws IllegalArgumentException {
@@ -102,186 +96,55 @@ public class Path {
 	 *                                  connected in the graph.
 	 * 
 	 */
-
-	// Création d'une classe sommet utilisée dans le plus court chemin
-
-	// Association d'une liste de sommet à une liste de noeud
-	private static List<Sommet> association(List<Node> nodes) {
-		List<Sommet> sommet = new ArrayList<Sommet>();
-
-		for (Node noeud : nodes) {
-			Sommet x = new Sommet(noeud, Integer.MAX_VALUE, null, false, null);
-			sommet.add(x);
-		}
-		return sommet;
-	}
-
-	// Renvois si un noeud est présent dans une liste de sommet
-	private static boolean present(Node noeud, List<Sommet> liste) {
-		boolean trouve = false;
-		for (Sommet S : liste) {
-			if (S.actuel == noeud) {
-				trouve = true;
-			}
-		}
-		return trouve;
-	}
-
-	// Renvoie du sommet associé au noeud
-	private static Sommet sommet_present(Node noeud, List<Sommet> liste) {
-		Sommet So = new Sommet(null, 0, null, false, null);
-		for (Sommet S : liste) {
-			if (S.actuel == noeud) {
-				So = S;
-			}
-		}
-		return So;
-	}
-
+	
 	public static Path createShortestPathFromNodes(Graph graph, List<Node> nodes) throws IllegalArgumentException {
-
-		List<Arc> arcs = new ArrayList<Arc>(); // Chemin renvoyé à la fin
-		List<Arc> arcs_inverse = new ArrayList<Arc>(); // Chemin renvoyé à la fin
-		List<Sommet> noeudNonMarque = new ArrayList<Sommet>(); // liste des noeuds non marqués
-		List<Sommet> tas = new ArrayList<Sommet>(); // Tas
-		List<Sommet> noeudMarque = new ArrayList<Sommet>(); // liste des noeuds marquées, utilisées pour trouver le
-		List<Arc> successeur = new ArrayList<Arc>(); // prochain sommet à marqué
-		Sommet y; // y sucesseur du noeud actuel marqué
-
-		if (nodes.size() > 1) {
-			for (int i = 0; i < nodes.size() - 1; i++) {
-				// Initialisation
-				noeudMarque.clear();
-				noeudNonMarque.clear();
-				arcs_inverse.clear();
-				tas.clear();
-				noeudNonMarque = association(graph.getNodes());
-				noeudMarque.clear();
-				Sommet source = new Sommet(nodes.get(i), Integer.MAX_VALUE, null, false, null);
-				noeudNonMarque.remove(source);
-				source.cost = 0;
-				source.marque = true;
-				noeudMarque.add(source);
-
-				float distance_enregistre = 0;
-				tas.add(source);
-
-				// Algorithme;
-				while (noeudNonMarque.size() != 0) {
-					// on trouve le sucesseur le plus proche
-					Sommet noeud_act = getLowestDistance(noeudMarque, noeudNonMarque);
-					// On le marque
-					noeudNonMarque.remove(sommet_present(noeud_act.actuel, noeudNonMarque));
-					noeudMarque.add(noeud_act);
-					// On met à jour la nouvelle distance
-					// Calcul du cout du père :
-					float cout = sommet_present(noeud_act.pred, noeudMarque).cost;
-					distance_enregistre = noeud_act.cost + cout;
-					successeur = noeud_act.actuel.getSuccessors();
-					for (Arc succ : successeur) {
-						if (present(succ.getDestination(), noeudNonMarque)) {
-							// On récupère les informations associées au noeud
-							y = sommet_present(succ.getDestination(), noeudNonMarque);
-							if (y.cost > (distance_enregistre + succ.getLength())) {
-								// On update dans la liste des sommets non marqués
-								noeudNonMarque.remove(sommet_present(y.actuel, noeudNonMarque));
-								// On met à jour le tas
-								if (tas.contains(y)) {
-									tas.remove(sommet_present(y.actuel, noeudNonMarque));
-									y.cost = distance_enregistre + succ.getLength();
-									y.pred = noeud_act.actuel;
-									tas.add(y);
-								}
-								// ou on inclu y dans le tas
-								else {
-									y.cost = distance_enregistre + succ.getLength();
-									y.pred = noeud_act.actuel;
-									tas.add(y);
-								}
-								// On rajoute dans la liste des sommets non marqués y avec son nouveau cout
-								noeudNonMarque.add(y);
-							}
-
-						}
-					}
-
-				}
-
-				Node parent = null;
-				// On récupère le dernier arc de notre chemin
-
-				for (int f = 0; f < noeudMarque.size(); f++) {
-					if (noeudMarque.get(noeudMarque.size() - (f + 1)).actuel.getId() == nodes.get(i + 1).getId()) {
-						arcs_inverse.add(noeudMarque.get(noeudMarque.size() - (f + 1)).arc_pre);
-						parent = noeudMarque.get(noeudMarque.size() - (f + 1)).pred;
-						System.out.println("le parent vaut maintenant : " + parent.getId());
-					} else if (parent != null
-							&& noeudMarque.get(noeudMarque.size() - (f + 1)).actuel.getId() == parent.getId()) {
-						System.out.println("On lui a trouvé un parent");
-						if (noeudMarque.get(noeudMarque.size() - (f + 1)).actuel.getId() == nodes.get(i).getId()) {
-							System.out.println("C'est enfin fini");
-						} else {
-							System.out.println("Arc " + noeudMarque.get(noeudMarque.size() - (f + 1)).arc_pre);
-							arcs_inverse.add(noeudMarque.get(noeudMarque.size() - (f + 1)).arc_pre);
-							System.out.println("parent " + noeudMarque.get(noeudMarque.size() - (f + 1)).pred);
-							parent = noeudMarque.get(noeudMarque.size() - (f + 1)).pred;
-							System.out.println("le parent vaut maintenant : " + parent.getId());
-						}
-					} else {
-						System.out.println("Parent id non égal");
-					}
-
-				}
-
-				System.out.println("Sortie du premier for");
-
-				// on inverse la liste
-				for (int e = 0; e < arcs_inverse.size(); e++) {
-					System.out.println("Dans la boucle");
-					arcs.add(arcs_inverse.get(arcs_inverse.size() - (e + 1)));
-					System.out.println(" Arc : " + arcs.get(e));
-				}
-				System.out.println("Arrivée en fin de parcours");
-			}
-
-			return new Path(graph, arcs);
-		} else if (nodes.size() == 1) {
-			return new Path(graph, nodes.get(0));
-		} else {
+		List<Arc> arcs = new ArrayList<Arc>();
+		if (nodes.size() == 0)
+		{
 			return new Path(graph);
 		}
-
+		else if  (nodes.size() == 1)
+		{
+			return new Path(graph, nodes.get(0));
+		}
+		else {
+			for ( int i=0; i<nodes.size()-1; i++)
+			{
+				arcs.add(succ_dist(nodes.get(i), nodes.get(i+1)));
+			}
+			return new Path(graph, arcs);
+		}		
 	}
 
-	// Retourne le successeur ayant le plus faible cout en distance
-
-	private static Sommet getLowestDistance(List<Sommet> noeudMarque, List<Sommet> noeudNonMarque) {
-		float lowestDistance = Integer.MAX_VALUE;
-		List<Arc> successeur = new ArrayList<Arc>();
-		Sommet Succ_sommet;
-		Sommet Succ_plus_pres = new Sommet(null, 0, null, false, null);
-		float cout;
-		// On va regarder pour nos sommets marqués tous les successeurs
-		for (Sommet Som : noeudMarque) {
-			successeur.addAll(Som.actuel.getSuccessors());
-		}
-
-		// Et en trouver celui qui est le plus proche
-		for (Arc S : successeur) {
-			Succ_sommet = new Sommet(S.getDestination(), 0, null, false, null);
-			if (present(S.getDestination(), noeudNonMarque)) {
-				cout = sommet_present(S.getOrigin(), noeudMarque).cost;
-				if (lowestDistance >= (S.getLength() + cout)) {
-					lowestDistance = S.getLength();
-					Succ_plus_pres = new Sommet(S.getDestination(), lowestDistance, S.getOrigin(), true, S);
+	private static Arc succ_dist(Node noeud_depart, Node noeud_arrive) throws IllegalArgumentException {
+		List<Arc> succ = new ArrayList<Arc>();
+		int num_dest = noeud_arrive.getId();
+		double dist_arete = 0;
+		int nb_passage = 0;
+		succ = noeud_depart.getSuccessors();
+		
+		List<Arc> arc = new ArrayList<Arc>();
+		for (Arc A : succ) {
+			if (A.getDestination().getId() == num_dest) {
+				nb_passage++;
+				if (nb_passage == 1) {
+					arc.clear();
+					dist_arete = A.getLength();
+				}
+				if (dist_arete >= A.getLength()) {
+					dist_arete = A.getLength();
+					arc.clear();
+					arc.add(A);
 				}
 			}
 		}
-
-		return Succ_plus_pres;
-
+		if (nb_passage == 0)
+		{
+			throw new IllegalArgumentException();
+		}
+		return arc.get(0);
 	}
-
+	
 	/**
 	 * Concatenate the given paths.
 	 * 
